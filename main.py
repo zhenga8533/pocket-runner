@@ -38,6 +38,13 @@ class Pocket_Runner:
                 self.background.append(600)
 
         # Player animation
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            elif event.type == KEYDOWN:
+                if event.key == K_SPACE or event.key == K_UP:
+                    self.player.jump()
         self.player.update()
 
         # Pygame control
