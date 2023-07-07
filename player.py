@@ -1,7 +1,7 @@
 import pygame
 from util import override
 
-GRAVITY = -0.9
+GRAVITY = -0.25
 
 
 class Player(pygame.sprite.Sprite):
@@ -26,18 +26,22 @@ class Player(pygame.sprite.Sprite):
         self.rect.topleft = [self.x, self.y]
 
     @override(pygame.sprite.Sprite)
-    def update(self):
+    def update(self, speed):
         # Player control
-        self.acceleration += GRAVITY
         if self.y <= self.ground:
+            self.acceleration += GRAVITY
             self.y = min(self.ground, self.y - self.acceleration)
 
         # Update image
         self.rect.topleft = [self.x, self.y]
-        self.frame = (self.frame + 0.2) % 4
+        self.frame = (self.frame + speed) % 4
         self.image = self.sprites[int(self.frame)]
         if self.y < self.ground:
             self.image = pygame.transform.rotate(self.image, 30)
 
     def jump(self):
-        self.acceleration = 13 * -GRAVITY
+        if self.y == self.ground:
+            self.acceleration = 30 * -GRAVITY
+
+    def down(self):
+        self.acceleration += 50 * GRAVITY
