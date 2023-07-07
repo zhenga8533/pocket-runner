@@ -1,9 +1,12 @@
 import pygame
+from pygame.locals import *
+from player import Player
 
 # Pygame constants
 WIDTH = 600
-HEIGHT = 300
-BACKGROUND = pygame.image.load("background.png")
+HEIGHT = 200
+BACKGROUND = pygame.image.load("assets/background.png")
+BACKGROUND = pygame.transform.scale(BACKGROUND, (600, 300))
 
 
 class Pocket_Runner:
@@ -16,9 +19,11 @@ class Pocket_Runner:
         pygame.display.set_caption('Pocket Runner')
 
         # Player variables
-        self.y = 0
+        self.player = Player(50, 115)
 
         # Game variables
+        self.sprites = pygame.sprite.Group()
+        self.sprites.add(self.player)
         self.background = [0, 600]
         self.speed = 1
 
@@ -32,6 +37,9 @@ class Pocket_Runner:
                 del self.background[i]
                 self.background.append(600)
 
+        # Player animation
+        self.player.update()
+
         # Pygame control
         self.draw()
         self.clock.tick(60)
@@ -39,7 +47,10 @@ class Pocket_Runner:
     def draw(self):
         # Draw background
         for i in range(len(self.background)):
-            self.display.blit(BACKGROUND, (self.background[i], -15))
+            self.display.blit(BACKGROUND, (self.background[i], -100))
+
+        # Draw player
+        self.sprites.draw(self.display)
 
         pygame.display.flip()
 
