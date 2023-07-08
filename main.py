@@ -22,7 +22,7 @@ class Pocket_Runner:
         pygame.display.set_caption('Pocket Runner')
 
         # Player variables
-        self.player = Player(50, 115)
+        self.player = Player(50, 155)
 
         # Game variables
         self.start = False
@@ -46,11 +46,15 @@ class Pocket_Runner:
                 if event.key == K_q:
                     pygame.quit()
                     quit()
-                elif event.key == K_SPACE or event.key == K_UP:
+                elif event.key == K_SPACE:
                     self.player.jump()
                     self.start = True
+                elif event.key == K_UP:
+                    self.player.stretch()
                 elif event.key == K_DOWN:
                     self.player.down()
+                    if self.player.y == self.player.ground:
+                        self.player.crouch()
 
         if not self.start:
             return
@@ -81,6 +85,7 @@ class Pocket_Runner:
             obstacle = Obstacle(800, 0)
             self.obstacles.append(obstacle)
             self.sprites.add(obstacle)
+            self.speed += 0.1
 
         # Player animation
         self.player.update(self.speed / (3.14**3))

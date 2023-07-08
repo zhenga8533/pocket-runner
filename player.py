@@ -15,15 +15,21 @@ class Player(pygame.sprite.Sprite):
         # Image control
         super().__init__()
         self.sprites = []
+        self.frame = 0
+        self.image = None
+        self.rect = None
+        self.update_sprites(40, 40)
+
+    def update_sprites(self, w, h):
+        self.sprites = []
         for i in range(1, 5):
             sprite = pygame.image.load(f'assets/player/player_{i}.png')
-            sprite = pygame.transform.scale(sprite, (40, 40))
+            sprite = pygame.transform.scale(sprite, (w, h))
             sprite = pygame.transform.flip(sprite, True, False)
             self.sprites.append(sprite)
-        self.frame = 0
-        self.image = self.sprites[self.frame]
+        self.image = self.sprites[int(self.frame)]
         self.rect = self.image.get_rect()
-        self.rect.topleft = [self.x, self.y]
+        self.rect.bottomleft = [self.x, self.y + (40 - h)]
 
     @override(pygame.sprite.Sprite)
     def update(self, speed):
@@ -33,7 +39,7 @@ class Player(pygame.sprite.Sprite):
             self.y = min(self.ground, self.y - self.acceleration)
 
         # Update image
-        self.rect.topleft = [self.x, self.y]
+        self.rect.bottomleft = [self.x, self.y]
         self.frame = (self.frame + speed) % 4
         self.image = self.sprites[int(self.frame)]
         if self.y < self.ground:
@@ -42,6 +48,12 @@ class Player(pygame.sprite.Sprite):
     def jump(self):
         if self.y == self.ground:
             self.acceleration = 30 * -GRAVITY
+
+    def crouch(self):
+        self.update_sprites(50, 30)
+
+    def stretch(self):
+        self.update_sprites(40, 40)
 
     def down(self):
         self.acceleration += 50 * GRAVITY
