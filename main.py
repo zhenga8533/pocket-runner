@@ -1,5 +1,7 @@
 import pygame
+from pygame import key
 from pygame.locals import *
+import random
 from player import Player
 from obstacle import Obstacle
 
@@ -7,9 +9,9 @@ from obstacle import Obstacle
 pygame.init()
 WIDTH = 600
 HEIGHT = 200
+FONT = pygame.font.Font("assets/pokemon_font.ttf", 18)
 BACKGROUND = pygame.image.load("assets/background.png")
 BACKGROUND = pygame.transform.scale(BACKGROUND, (600, 300))
-FONT = pygame.font.Font("assets/pokemon_font.ttf", 18)
 
 
 class Pocket_Runner:
@@ -29,6 +31,7 @@ class Pocket_Runner:
         self.speed = 3
         self.score = 0
         self.obstacles = [Obstacle(800, 0)]
+        self.next_obstacle = 100
 
         self.sprites = pygame.sprite.Group()
         self.sprites.add(self.player)
@@ -43,21 +46,24 @@ class Pocket_Runner:
                 pygame.quit()
                 quit()
             elif event.type == KEYDOWN:
-                if event.key == K_q:
-                    pygame.quit()
-                    quit()
-                elif event.key == K_SPACE:
-                    self.player.jump()
-                    self.start = True
-                elif event.key == K_UP:
-                    self.player.stretch()
-                elif event.key == K_DOWN:
-                    self.player.down()
-                    if self.player.y == self.player.ground:
-                        self.player.crouch()
-
+                self.start = True
+            elif event.type == KEYUP and event.key == K_DOWN:
+                self.player.stretch()
         if not self.start:
             return
+
+        # Player control
+        keys = key.get_pressed()
+        if keys[K_q]:
+            pygame.quit()
+            quit()
+        if keys[K_SPACE]:
+            self.player.jump()
+            self.start = True
+        if keys[K_DOWN]:
+            self.player.down()
+            if self.player.y == self.player.ground and self.player.rect.height == 40:
+                self.player.crouch()
 
         # Background scrolling
         for i in range(len(self.background)):
@@ -81,17 +87,20 @@ class Pocket_Runner:
             if self.obstacles[i].x < -self.obstacles[i].image.get_width():
                 self.obstacles[i].kill()
 
-        if self.score % 100 == 0:
-            obstacle = Obstacle(800, 0)
+        # Generate obstacles
+        if self.score == self.next_obstacle:
+            obstacle = Obstacle(800, random.randint(0, 1))
             self.obstacles.append(obstacle)
             self.sprites.add(obstacle)
-            self.speed += 0.1
+            self.next_obstacle += int(random.randint(50, 200) / (1 + self.score/1000))
 
         # Player animation
         self.player.update(self.speed / (3.14**3))
 
         # Pygame control
         self.score += 1
+        if self.score % 100 == 0:
+            self.speed += 0.1
         self.draw()
         self.clock.tick(60)
 
